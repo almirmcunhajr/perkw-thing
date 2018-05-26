@@ -31,7 +31,7 @@ void setup() {
   emon1.current(CT_PIN, 111.1); 
   
   thing.init("KNoTThing");
-  thing.registerFloatData(CT_NAME, CT_ID, KNOT_TYPE_ID_CURRENT, KNOT_UNIT_CURRENT_A, current_read, );
+  thing.registerFloatData(CT_NAME, CT_ID, KNOT_TYPE_ID_CURRENT, KNOT_UNIT_CURRENT_A, current_read, NULL);
   thing.registerBoolData(RELAY_NAME, RELAY_ID, KNOT_TYPE_ID_SWITCH, KNOT_UNIT_NOT_APPLICABLE, relay_read, relay_write);
   thing.registerDefaultConfig(CT_ID, KNOT_EVT_FLAG_CHANGE, 0, 0, 0, 0, 0);
   thing.registerDefaultConfig(RELAY_ID, KNOT_EVT_FLAG_TIM, 10, 0, 0, 0, 0);
