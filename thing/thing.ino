@@ -13,10 +13,12 @@ KNoTThing thing;
 EnergyMonitor emon1;
 
 static int current_read(uint8_t *val) {
-  *val = analogRead(CT_PIN);
+  double irms = emon1.calcIrms(1480);
+
+  *val = irms;
 
   Serial.println(F("Current: "));
-  Serial.println(*val);
+  Serial.println(irms);
   
   return 0;
 }
