@@ -13,14 +13,35 @@ KNoTThing thing;
 EnergyMonitor emon1;
 
 static int current_read(uint8_t *val) {
+  *val = analogRead(CT_PIN);
+
+  Serial.println(F("Current: "));
+  Serial.println(*val);
+  
   return 0;
 }
 
 static int relay_read(uint8_t *val) {
- return 0;
+  *val = digitalRead(RELAY_PIN);
+
+  Serial.println(F("Current Status"));
+  if (*val)
+    Serial.println(F("ON"));
+  else
+    Serial.println(F("OFF"));
+ 
+  return 0;
 }
 
 static int relay_write(uint8_t *val) {
+  digitalWrite(RELAY_PIN, *val);
+
+  Serial.println(F("Current Status"));
+  if (*val)
+    Serial.println(F("ON"));
+  else
+    Serial.println(F("OFF"));
+ 
   return 0;
 }
 
