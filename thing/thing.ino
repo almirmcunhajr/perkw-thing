@@ -1,5 +1,6 @@
 #include <KNoTThing.h>
 #include <EmonLib.h>
+#include <math.h>
 
 #define CT_ID 1
 #define CT_PIN 1
@@ -9,41 +10,32 @@
 #define RELAY_PIN 1
 #define RELAY_NAME "Relay"
 
+#define EPS 1e-2
+
 KNoTThing thing;
 EnergyMonitor emon1;
+float last_irms = 0;
 
-static int current_read(uint8_t *val) {
-  double irms = emon1.calcIrms(1480);
+static int current_read(int32_t *val_int, uint32_t *val_dec, int32_t *multiplier) {
+  float irms = (float) emon1.calcIrms(1480);
 
-  *val = irms;
-
-  Serial.println(F("Current: "));
-  Serial.println(irms);
+  if (abs(irms-last_irms) < EPS) // Update only on significant changes
+    return -1;
   
+  last_irms = irms;
+
   return 0;
 }
 
 static int relay_read(uint8_t *val) {
   *val = digitalRead(RELAY_PIN);
 
-  Serial.println(F("Current Status"));
-  if (*val)
-    Serial.println(F("ON"));
-  else
-    Serial.println(F("OFF"));
- 
   return 0;
 }
 
 static int relay_write(uint8_t *val) {
-  digitalWrite(RELAY_PIN, *val);
-
-  Serial.println(F("Current Status"));
-  if (*val)
-    Serial.println(F("ON"));
-  else
-    Serial.println(F("OFF"));
- 
+  digitalWrite(RELAY_PIN, *val); 
+  
   return 0;
 }
 
@@ -58,8 +50,6 @@ void setup() {
   thing.registerBoolData(RELAY_NAME, RELAY_ID, KNOT_TYPE_ID_SWITCH, KNOT_UNIT_NOT_APPLICABLE, relay_read, relay_write);
   thing.registerDefaultConfig(CT_ID, KNOT_EVT_FLAG_CHANGE, 0, 0, 0, 0, 0);
   thing.registerDefaultConfig(RELAY_ID, KNOT_EVT_FLAG_TIME, 10, 0, 0, 0, 0);
-
-  Serial.println(F("Perkw Thing"));
 }
 
 void loop() {
