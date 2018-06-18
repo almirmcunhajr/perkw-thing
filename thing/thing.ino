@@ -22,6 +22,8 @@ static int current_read(int32_t *val_int, uint32_t *val_dec, int32_t *multiplier
   if (abs(irms-last_irms) < EPS) // Update only on significant changes
     return -1;
   
+  //TODO: Use the parameters to send the new current value to the cloud
+  
   last_irms = irms;
 
   return 0;
