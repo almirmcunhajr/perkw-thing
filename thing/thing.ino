@@ -19,13 +19,17 @@ float last_irms = 0;
 static int current_read(int32_t *val_int, uint32_t *val_dec, int32_t *multiplier) {
   float irms = (float) emon1.calcIrms(1480);
 
-  if (abs(irms-last_irms) < EPS) // Update only on significant changes
-    return -1;
+  if (abs(irms-last_irms) >= EPS) { // Update only on significant changes
+    *val_int = irms;
+    *val_dec = 0;
+    *multiplier = 1;
+    last_irms = irms;
+  } else {
+    *val_int = last_irms;
+    *val_dec = 0;
+    *multiplier = 1;
+  }
   
-  //TODO: Use the parameters to send the new current value to the cloud
-  
-  last_irms = irms;
-
   return 0;
 }
 
