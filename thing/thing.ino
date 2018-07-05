@@ -7,7 +7,7 @@
 #define CT_NAME "Current transformer"
 
 #define RELAY_ID 2
-#define RELAY_PIN 1
+#define RELAY_PIN 2
 #define RELAY_NAME "Relay"
 
 #define EPS 1e-2
