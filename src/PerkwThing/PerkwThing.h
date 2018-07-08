@@ -1,6 +1,6 @@
 #include "Server.h"
 #include "States.h"
-#include "SensorsInfos.h" // To do: avoid replication
+#include <SensorsInfos.h>
 #include <stdint.h>
 #include <Arduino.h>
 #include <math.h>

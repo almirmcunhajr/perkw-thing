@@ -30,7 +30,7 @@ void Server::registerSensor(uint32_t id, char *name) {
 	Serial.write(endding_signal);
 }
 
-int Server::explore(int *state, bool *receiving, byte *incoming_data, int *tail) {
+int Server::explore(bool *receiving, byte *incoming_data, int *tail) {
 	byte rb;
 
 	if (Serial.available() == 0) // No incoming data

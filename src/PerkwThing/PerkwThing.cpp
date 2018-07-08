@@ -51,7 +51,7 @@ void PerkwThing::run() {
 
 	switch (state) {
 		case EXPLORE: // Explore requests from server
-			switch (server.explore(&state, &receiving, incoming_data.raw, &incoming_data_tail)) {
+			switch (server.explore(&receiving, incoming_data.raw, &incoming_data_tail)) {
 				case 0: // No incoming data
 					state = UPDATE;
 					break;
