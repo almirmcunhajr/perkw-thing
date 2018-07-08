@@ -1,6 +1,6 @@
 #include <EmonLib.h>
 #include <PerkwThing.h>
-#include "SensorsInfos.h"
+#include <SensorsInfos.h>
 
 EnergyMonitor emon1;
 PerkwThing thing; 
