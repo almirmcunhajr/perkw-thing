@@ -12,13 +12,23 @@ float currentRead() {
 }
 
 uint32_t relayRead() {
-  uint32_t state = (uint32_t) digitalRead(RELAY_PIN);
+  uint32_t state;
+
+  if (digitalRead(RELAY_PIN) == HIGH) {
+    state = 1;
+  } else {
+    state = 0;
+  }
 
   return state;
 }
 
 void relayWrite(uint32_t state) {
-  digitalWrite(RELAY_PIN, state);
+  if (state == 1) {
+    digitalWrite(RELAY_PIN, HIGH);
+  } else {
+    digitalWrite(RELAY_PIN, LOW);
+  }
 }
 
 void setup() {
