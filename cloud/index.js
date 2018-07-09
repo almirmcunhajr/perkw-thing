@@ -15,17 +15,23 @@ var receiving = false;
 var msg_type = -1;
 
 function handleMessage() {
+	var id = new Uint32Array(msg.slice(0,4))[0];
+
 	if (msg_type == messages_types.SENSOR_REGISTER_MESSAGE) {
-		
+		var name = new String();
+		var name_msg = msg.slice(4,14);
+
+		for (let i = 0; i < name_msg[i] != 0; i++) {
+			name += String.fromCharCode(name_msg[i]);
+		}		
 	} else if (msg_type == messages_types.UPDATE_MESSAGE) {
-		var id = new Uint32Array(msg.slice(0,4))[0];
 		var value_buffer = new ArrayBuffer(4);
 		var value_uint8 = new Uint8Array(value_buffer);
+		var value_msg = msg.slice(4,8)
 
-		value_uint8[0] = msg.slice(4,8)[0];
-		value_uint8[1] = msg.slice(4,8)[1];
-		value_uint8[2] = msg.slice(4,8)[2];
-		value_uint8[3] = msg.slice(4,8)[3];
+		for (let i = 0; i < 4; i++) {
+			value_uint8[i] = value_msg[i];
+		}
 
 		var value_view = new DataView(value_buffer);
 		var value;
