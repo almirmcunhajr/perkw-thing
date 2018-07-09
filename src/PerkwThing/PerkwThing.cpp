@@ -9,8 +9,8 @@ struct FetchSensors {
 
 struct StateSensors {
 	uint32_t id;
-	bool (*reader)();
-	void (*writer)(bool);
+	uint32_t (*reader)();
+	void (*writer)(uint32_t);
 } state_sensor; // There'is only one state sensor for this project
 
 union IncomingData { // There's only one type of server request for this project
@@ -29,7 +29,7 @@ void PerkwThing::registerFetchSensor(uint32_t id, char *name, float (*reader)())
 	fetch_sensor.reader = reader;
 	server.registerSensor(id, name);
 }
-void PerkwThing::registerStateSensor(uint32_t id, char *name, bool (*reader)(), void (*writer)(bool)) {
+void PerkwThing::registerStateSensor(uint32_t id, char *name, uint32_t (*reader)(), void (*writer)(uint32_t)) {
 	Server server;
 
 	state_sensor.id = id;
@@ -46,7 +46,7 @@ void PerkwThing::run() {
 	} electric_current;
 	union RelayState {
 		byte raw[4];
-		bool value;
+		uint32_t value;
 	} relay_state;
 
 	switch (state) {

@@ -8,6 +8,6 @@
 class PerkwThing {
 public:
 	void registerFetchSensor(uint32_t id, char *name, float (*reader)());
-	void registerStateSensor(uint32_t id, char *name, bool (*reader)(), void (*writer)(bool));
+	void registerStateSensor(uint32_t id, char *name, uint32_t (*reader)(), void (*writer)(uint32_t));
 	void run();
 };

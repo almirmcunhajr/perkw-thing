@@ -11,13 +11,13 @@ float currentRead() {
   return irms;
 }
 
-bool relayRead() {
-  bool state = digitalRead(RELAY_PIN);
+uint32_t relayRead() {
+  uint32_t state = (uint32_t) digitalRead(RELAY_PIN);
 
   return state;
 }
 
-void relayWrite(bool state) {
+void relayWrite(uint32_t state) {
   digitalWrite(RELAY_PIN, state);
 }
 
