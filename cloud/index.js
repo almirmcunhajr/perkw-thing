@@ -1,3 +1,4 @@
+const express = require('express');
 const SerialPort = require('serialport');
 const messages_types = require('./messages-types');
 const sensors_infos = require('./sensors-infos');
@@ -5,10 +6,11 @@ const EventEmitter = require('events');
 
 class DataEmitter extends EventEmitter {}
 
-const serialport = new SerialPort('/dev/ttyUSB1');
+const serialport = new SerialPort('/dev/ttyUSB0');
 const dataEmiter = new DataEmitter();
+const interface = express();
 
-const starting_signal = 0x3C ,endding_signal = 0x3E;
+const starting_signal = 0x3C, ending_signal = 0x3E;
 
 var buf = [], msg = [];
 var receiving = false;
@@ -55,7 +57,7 @@ dataEmiter.on('new', () => {
 	while (buf.length > 0) {
 		incoming_byte = buf[0];
 		if (receiving) {
-			if (incoming_byte != endding_signal) {
+			if (incoming_byte != ending_signal) {
 				if (msg_type == -1) {
 					msg_type = incoming_byte;
 				} else {
@@ -77,3 +79,18 @@ dataEmiter.on('new', () => {
 serialport.on('error', (err) => {
   console.log('Serial port error: ', err.message);
 })
+
+interface.get('/set-relay-state', (req, res) => {
+	var state = req.query.state;
+
+	if (state == 0 || state == 1) {
+		let msg = new Buffer.from([starting_signal, state, ending_signal]);
+		serialport.write(msg);
+		res.send('Done!');
+	} else 
+		res.send('Invalid param');
+})
+
+interface.listen(8000, () => {
+	console.log('Perkw interface listening on port 8000');
+});
