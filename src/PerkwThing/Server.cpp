@@ -1,16 +1,16 @@
 #include "Server.h"
 
 union SensorRegisterMessage {
-	byte raw[41];
+	byte raw[SENSOR_REGISTER_MESSAGE_SIZE];
 	struct Data {
 		byte type;
 		uint32_t id;
-		char name[36];
+		char name[10];
 	} data;
 } sensor_register_msg;
 
 union UpdateMessage {
-	byte raw[65];
+	byte raw[UPDATE_MESSAGE_SIZE];
 	struct Data {
 		byte type;
 		uint32_t id;
@@ -26,7 +26,7 @@ void Server::registerSensor(uint32_t id, char *name) {
 	sensor_register_msg.data.id = id;
 	strcpy(sensor_register_msg.data.name, name);
 	Serial.write(startting_signal);
-	Serial.write(sensor_register_msg.raw, 41);
+	Serial.write(sensor_register_msg.raw, SENSOR_REGISTER_MESSAGE_SIZE);
 	Serial.write(endding_signal);
 }
 
@@ -60,6 +60,6 @@ void Server::update(uint32_t id, byte value[4]) {
 	update_msg.data.id = id;
 	memcpy(update_msg.data.value, value, 4);
 	Serial.write(startting_signal);
-	Serial.write(update_msg.raw, 65);
+	Serial.write(update_msg.raw, UPDATE_MESSAGE_SIZE);
 	Serial.write(endding_signal);
 }
