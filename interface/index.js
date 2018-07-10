@@ -47,7 +47,7 @@ function handleMessage() {
 			value = value_view.getUint32(0);
 		}
 
-		console.log('Update message received: ', id, value);
+		console.log('Update message received: ', id, value.toFixed(1));
 	}
 }
 
