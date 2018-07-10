@@ -21,7 +21,7 @@ private:
 	} relay; // There'is only one state sensor for this project relay
 
 	int state = EXPLORE, incoming_data_tail = 0;
-	bool receiving = false;
+	bool receiving = false, received = false;
 	float last_electric_current = 0;
 	byte incoming_data[1]; // There's only one incoming byte for this project
 
@@ -52,7 +52,7 @@ public:
 
 		switch (state) {
 			case EXPLORE: // Explore requests from communicator
-				switch (comm.explore(&receiving, incoming_data, &incoming_data_tail)) {
+				switch (comm.explore(&receiving, &received, incoming_data, &incoming_data_tail)) {
 					case 0: // No incoming data
 						state = UPDATE;
 						break;

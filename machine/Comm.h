@@ -32,24 +32,25 @@ public:
 		strcpy(register_msg.data.name, name);
 		Serial.write(starting_signal);
 		Serial.write(register_msg.raw, REGISTER_MESSAGE_SIZE);
-		Serial.write(ending_signal);
 	}
 
-	int explore(bool *receiving, byte *incoming_data, int *tail) {
+	int explore(bool *receiving, bool *received, byte *incoming_data, int *tail) {
 		byte rb;
 
 		if (Serial.available() == 0){ // No incoming data
 			return 0;
 		}
-
 		while (Serial.available() > 0) {
 			rb = Serial.read();
 			if (*receiving) {
-				if (rb != ending_signal) {
+				if (*tail >= INCOMING_MESSAGE_SIZE)
+					*received = true;
+				if (!(*received)) {
 					incoming_data[*tail] = rb;
 					*tail++;
 				} else {
 					*receiving = false;
+					*received = false;
 					*tail = 0;
 					return 1; // All data received
 				}
@@ -57,7 +58,6 @@ public:
 				*receiving = true;
 			}
 		}
-
 		return 2; // Missing data
 	}
 
@@ -67,6 +67,5 @@ public:
 		memcpy(update_msg.data.value, value, 4);
 		Serial.write(starting_signal);
 		Serial.write(update_msg.raw, UPDATE_MESSAGE_SIZE);
-		Serial.write(ending_signal);
 	}
 };

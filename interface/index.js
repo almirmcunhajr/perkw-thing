@@ -13,7 +13,7 @@ const interface = express();
 const starting_signal = 0x3C, ending_signal = 0x3E;
 
 var buf = [], msg = [];
-var receiving = false;
+var receiving = false, received = false;
 var msg_type = -1;
 
 function handleMessage() {
@@ -57,7 +57,16 @@ dataEmiter.on('new', () => {
 	while (buf.length > 0) {
 		incoming_byte = buf[0];
 		if (receiving) {
-			if (incoming_byte != ending_signal) {
+			if (msg_type == messages_types.UPDATE_MESSAGE){
+				if (msg.length >= messages_types.UPDATE_MESSAGE_SIZE) {
+					received = true;
+				}
+			} else if (msg_type == messages_types.REGISTER_MESSAGE) {
+				if (msg.length >= messages_types.REGISTER_MESSAGE_SIZE) {
+					received = true;
+				}
+			}
+			if (!received) {
 				if (msg_type == -1) {
 					msg_type = incoming_byte;
 				} else {
@@ -66,6 +75,7 @@ dataEmiter.on('new', () => {
 			} else {
 				handleMessage();
 				receiving = false;
+				received = false;
 				msg_type = -1;
 				msg = [];
 			}
@@ -84,7 +94,7 @@ interface.get('/set-relay-state', (req, res) => {
 	var state = req.query.state;
 
 	if (state == 0 || state == 1) {
-		let msg = new Buffer.from([starting_signal, state, ending_signal]);
+		let msg = new Buffer.from([starting_signal, state]);
 		serialport.write(msg);
 		res.send('Done!');
 	} else 
