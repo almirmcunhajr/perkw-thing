@@ -3,16 +3,16 @@
 #include <string.h>
 #include <Arduino.h>
 
-class Server {
+class Comm {
 private:
-	union SensorRegisterMessage {
-		byte raw[SENSOR_REGISTER_MESSAGE_SIZE];
+	union RegisterMessage {
+		byte raw[REGISTER_MESSAGE_SIZE];
 		struct Data {
 			byte type;
 			uint32_t id;
 			char name[10];
 		} data;
-	} sensor_register_msg;
+	} register_msg;
 
 	union UpdateMessage {
 		byte raw[UPDATE_MESSAGE_SIZE];
@@ -26,12 +26,12 @@ private:
 	const byte starting_signal = 0x3C, ending_signal = 0x3E;
 
 public:
-	void registerSensor(uint32_t id, char *name) {
-		sensor_register_msg.data.type = SENSOR_REGISTER_MESSAGE;
-		sensor_register_msg.data.id = id;
-		strcpy(sensor_register_msg.data.name, name);
+	void cregister(uint32_t id, char *name) {
+		register_msg.data.type = REGISTER_MESSAGE;
+		register_msg.data.id = id;
+		strcpy(register_msg.data.name, name);
 		Serial.write(starting_signal);
-		Serial.write(sensor_register_msg.raw, SENSOR_REGISTER_MESSAGE_SIZE);
+		Serial.write(register_msg.raw, REGISTER_MESSAGE_SIZE);
 		Serial.write(ending_signal);
 	}
 

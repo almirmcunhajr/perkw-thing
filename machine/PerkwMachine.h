@@ -1,4 +1,4 @@
-#include "Server.h"
+#include "Comm.h"
 #include "States.h"
 #include <SensorsInfos.h>
 #include <stdint.h>
@@ -12,32 +12,32 @@ private:
 	struct FetchSensors {
 		uint32_t id;
 		float (*reader)();
-	} fetch_sensor; // There'is only one fetch sensor for this project
+	} current_sensor; // There'is only one fetch sensor for this project
 
-	struct StateSensors {
+	struct Actuators {
 		uint32_t id;
 		uint32_t (*reader)();
 		void (*writer)(uint32_t);
-	} state_sensor; // There'is only one state sensor for this project
+	} relay; // There'is only one state sensor for this project relay
 
 	int state = EXPLORE, incoming_data_tail = 0;
 	bool receiving = false;
 	float last_electric_current = 0;
 	byte incoming_data[1]; // There's only one incoming byte for this project
 
-	Server server;
+	Comm comm;
 
 public:
 	void registerFetchSensor(uint32_t id, char *name, float (*reader)()) {
-		fetch_sensor.id = id;
-		fetch_sensor.reader = reader;
-		server.registerSensor(id, name);
+		current_sensor.id = id;
+		current_sensor.reader = reader;
+		comm.cregister(id, name);
 	}
-	void registerStateSensor(uint32_t id, char *name, uint32_t (*reader)(), void (*writer)(uint32_t)) {
-		state_sensor.id = id;
-		state_sensor.reader = reader;
-		state_sensor.writer = writer;
-		server.registerSensor(id, name);
+	void registerActuator(uint32_t id, char *name, uint32_t (*reader)(), void (*writer)(uint32_t)) {
+		relay.id = id;
+		relay.reader = reader;
+		relay.writer = writer;
+		comm.cregister(id, name);
 	}
 
 	void run() {
@@ -51,8 +51,8 @@ public:
 		} relay_state;
 
 		switch (state) {
-			case EXPLORE: // Explore requests from server
-				switch (server.explore(&receiving, incoming_data, &incoming_data_tail)) {
+			case EXPLORE: // Explore requests from communicator
+				switch (comm.explore(&receiving, incoming_data, &incoming_data_tail)) {
 					case 0: // No incoming data
 						state = UPDATE;
 						break;
@@ -64,22 +64,22 @@ public:
 						break;
 				}
 				break;
-			case HANDLE: // Handle a request of the server
+			case HANDLE: // Handle a request of the communicator
 				if (incoming_data[0]) {
-					state_sensor.writer(1);
+					relay.writer(1);
 				} else {
-					state_sensor.writer(0);
+					relay.writer(0);
 				}
 				state = EXPLORE;
 				break;
 			case UPDATE: // Update the sensors values in the cloud
-				electric_current.value = fetch_sensor.reader();
-				relay_state.value = state_sensor.reader();
+				electric_current.value = current_sensor.reader();
+				relay_state.value = relay.reader();
 				if (abs(electric_current.value - last_electric_current) >= EPS) { // Update only under significative changes
-					server.update(CURRENT_SENSOR_ID, electric_current.raw);
+					comm.update(CURRENT_SENSOR_ID, electric_current.raw);
 					last_electric_current = electric_current.value;
 				}
-				server.update(RELAY_SENSOR_ID, relay_state.raw);
+				comm.update(RELAY_ID, relay_state.raw);
 				state = EXPLORE;
 				break;
 		}

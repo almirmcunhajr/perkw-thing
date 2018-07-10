@@ -19,7 +19,7 @@ var msg_type = -1;
 function handleMessage() {
 	var id = new Uint32Array(msg.slice(0,4))[0];
 
-	if (msg_type == messages_types.SENSOR_REGISTER_MESSAGE) {
+	if (msg_type == messages_types.REGISTER_MESSAGE) {
 		var name = new String();
 		var name_msg = msg.slice(4,14);
 
@@ -40,7 +40,7 @@ function handleMessage() {
 
 		if (id == sensors_infos.CURRENT_SENSOR_ID) {
 			value = value_view.getFloat32(0, true);
-		} else if (id = sensors_infos.RELAY_SENSOR_ID) {
+		} else if (id = sensors_infos.RELAY_ID) {
 			value = value_view.getUint32(0);
 		}
 	}

@@ -36,7 +36,7 @@ void setup() {
   pinMode(RELAY_PIN, OUTPUT);
   emon1.current(CURRENT_SENSOR_PIN, 111.1);
   machine.registerFetchSensor(CURRENT_SENSOR_ID, CURRENT_SENSOR_NAME, currentRead);
-  machine.registerStateSensor(RELAY_SENSOR_ID, RELAY_NAME, relayRead, relayWrite);
+  machine.registerActuator(RELAY_ID, RELAY_NAME, relayRead, relayWrite);
 }
 
 void loop() {
