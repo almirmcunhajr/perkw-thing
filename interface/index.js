@@ -28,7 +28,6 @@ function handleMessage() {
 		}	
 
 		console.log('Register message received: ', id, name);
-
 	} else if (msg_type == messages_types.UPDATE_MESSAGE) {
 		var value_buffer = new ArrayBuffer(4);
 		var value_uint8 = new Uint8Array(value_buffer);
@@ -43,11 +42,16 @@ function handleMessage() {
 
 		if (id == sensors_infos.CURRENT_SENSOR_ID) {
 			value = value_view.getFloat32(0, true);
+
+			console.log('Update message received: ', id, value.toFixed(1));
+			
 		} else if (id = sensors_infos.RELAY_ID) {
 			value = value_view.getUint32(0);
-		}
 
-		console.log('Update message received: ', id, value.toFixed(1));
+			if (value > 0)
+				console.log('Update message received: ', id, 'true');
+			else console.log('Update message received: ', id, 'false');
+		}
 	}
 }
 
