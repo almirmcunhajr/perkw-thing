@@ -1,61 +1,42 @@
-#include <KNoTThing.h>
 #include <EmonLib.h>
-#include <math.h>
+#include <PerkwThing.h>
+#include <SensorsInfos.h>
 
-#define CT_ID 1
-#define CT_PIN 1
-#define CT_NAME "Current transformer"
-
-#define RELAY_ID 2
-#define RELAY_PIN 2
-#define RELAY_NAME "Relay"
-
-#define EPS 1e-2
-
-KNoTThing thing;
 EnergyMonitor emon1;
-float last_irms = 0;
+PerkwThing thing; 
 
-static int current_read(int32_t *val_int, uint32_t *val_dec, int32_t *multiplier) {
+float currentRead() {
   float irms = (float) emon1.calcIrms(1480);
 
-  if (abs(irms-last_irms) >= EPS) { // Update only on significant changes
-    *val_int = irms;
-    *val_dec = 0;
-    *multiplier = 1;
-    last_irms = irms;
+  return irms;
+}
+
+uint32_t relayRead() {
+  uint32_t state;
+
+  if (digitalRead(RELAY_PIN) == HIGH) {
+    state = 1;
   } else {
-    *val_int = last_irms;
-    *val_dec = 0;
-    *multiplier = 1;
+    state = 0;
   }
-  
-  return 0;
+
+  return state;
 }
 
-static int relay_read(uint8_t *val) {
-  *val = digitalRead(RELAY_PIN);
-
-  return 0;
-}
-
-static int relay_write(uint8_t *val) {
-  digitalWrite(RELAY_PIN, *val); 
-  
-  return 0;
+void relayWrite(uint32_t state) {
+  if (state == 1) {
+    digitalWrite(RELAY_PIN, HIGH);
+  } else {
+    digitalWrite(RELAY_PIN, LOW);
+  }
 }
 
 void setup() {
   Serial.begin(9600);
-  
   pinMode(RELAY_PIN, OUTPUT);
-  emon1.current(CT_PIN, 111.1); 
-  
-  thing.init("KNoTThing");
-  thing.registerFloatData(CT_NAME, CT_ID, KNOT_TYPE_ID_CURRENT, KNOT_UNIT_CURRENT_A, current_read, NULL);
-  thing.registerBoolData(RELAY_NAME, RELAY_ID, KNOT_TYPE_ID_SWITCH, KNOT_UNIT_NOT_APPLICABLE, relay_read, relay_write);
-  thing.registerDefaultConfig(CT_ID, KNOT_EVT_FLAG_CHANGE, 0, 0, 0, 0, 0);
-  thing.registerDefaultConfig(RELAY_ID, KNOT_EVT_FLAG_TIME, 10, 0, 0, 0, 0);
+  emon1.current(CURRENT_SENSOR_PIN, 111.1);
+  thing.registerFetchSensor(CURRENT_SENSOR_ID, CURRENT_SENSOR_NAME, currentRead);
+  thing.registerStateSensor(RELAY_SENSOR_ID, RELAY_NAME, relayRead, relayWrite);
 }
 
 void loop() {
