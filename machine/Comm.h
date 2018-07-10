@@ -34,7 +34,7 @@ public:
 		Serial.write(register_msg.raw, REGISTER_MESSAGE_SIZE);
 	}
 
-	int explore(bool *receiving, bool *received, byte *incoming_data, int *tail) {
+	int explore(bool *receiving, byte *incoming_data, int *tail) {
 		byte rb;
 
 		if (Serial.available() == 0){ // No incoming data
@@ -43,14 +43,11 @@ public:
 		while (Serial.available() > 0) {
 			rb = Serial.read();
 			if (*receiving) {
-				if (*tail >= INCOMING_MESSAGE_SIZE)
-					*received = true;
-				if (!(*received)) {
+				if (rb != ending_signal) {
 					incoming_data[*tail] = rb;
 					*tail++;
 				} else {
 					*receiving = false;
-					*received = false;
 					*tail = 0;
 					return 1; // All data received
 				}

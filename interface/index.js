@@ -103,7 +103,7 @@ interface.get('/set-relay-state', (req, res) => {
 	var state = req.query.state;
 
 	if (state == 0 || state == 1) {
-		let msg = new Buffer.from([starting_signal, state]);
+		let msg = new Buffer.from([starting_signal, state, ending_signal]);
 
 		console.log('Sending request to set relay state to: ', state);
 
