@@ -3,6 +3,7 @@ const SerialPort = require('serialport');
 const messages_types = require('./messages-types');
 const sensors_infos = require('./sensors-infos');
 const EventEmitter = require('events');
+var MongoClient = require('mongodb').MongoClient;
 
 class DataEmitter extends EventEmitter {}
 
@@ -15,6 +16,7 @@ const starting_signal = 0x3C, ending_signal = 0x3E;
 var buf = [], msg = [];
 var receiving = false, received = false;
 var msg_type = -1;
+var db_url = "mongodb://localhost:27017/thing";
 
 function handleMessage() {
 	var id = new Uint32Array(msg.slice(0,4))[0];
@@ -28,6 +30,15 @@ function handleMessage() {
 		}	
 
 		console.log('Register message received: ', id, name);
+
+		MongoClient.connect(db_url, { useNewUrlParser: true }, (err, db) => {
+			if (err) throw err;
+			dbo = db.db('thing');
+			var query = {id: id};
+			var update = {$set: {id: id, name: name, data: []}};
+			dbo.collection('components').update(query, update, {upsert: true});
+		});
+
 	} else if (msg_type == messages_types.UPDATE_MESSAGE) {
 		var value_buffer = new ArrayBuffer(4);
 		var value_uint8 = new Uint8Array(value_buffer);
@@ -41,16 +52,35 @@ function handleMessage() {
 		var value;
 
 		if (id == sensors_infos.CURRENT_SENSOR_ID) {
+			var moment = Date.now();
+
 			value = value_view.getFloat32(0, true);
 
 			console.log('Update message received: ', id, value.toFixed(1));
+
+			MongoClient.connect(db_url, { useNewUrlParser: true }, (err, db) => {
+				if (err) throw err;
+				dbo = db.db('thing');
+				var query = {id: id};
+				var update = {$push: {data: {moment: moment, value: value}}};
+				dbo.collection('components').update(query, update);
+			});
 			
 		} else if (id = sensors_infos.RELAY_ID) {
 			value = value_view.getUint32(0);
 
-			if (value > 0)
-				console.log('Update message received: ', id, 'true');
-			else console.log('Update message received: ', id, 'false');
+			if (value > 0) value = true;
+			else value = false;
+
+			console.log('Update message received: ', id, value);
+
+			MongoClient.connect(db_url, { useNewUrlParser: true }, (err, db) => {
+				if (err) throw err;
+				dbo = db.db('thing');
+				var query = {id: id};
+				var update = {$set: {data: value}};
+				dbo.collection('components').update(query, update);
+			});
 		}
 	}
 }
