@@ -25,7 +25,10 @@ function handleMessage() {
 
 		for (let i = 0; i < name_msg[i] != 0; i++) {
 			name += String.fromCharCode(name_msg[i]);
-		}		
+		}	
+
+		console.log('Register message received: ', id, name);
+
 	} else if (msg_type == messages_types.UPDATE_MESSAGE) {
 		var value_buffer = new ArrayBuffer(4);
 		var value_uint8 = new Uint8Array(value_buffer);
@@ -43,6 +46,8 @@ function handleMessage() {
 		} else if (id = sensors_infos.RELAY_ID) {
 			value = value_view.getUint32(0);
 		}
+
+		console.log('Update message received: ', id, value);
 	}
 }
 
@@ -95,12 +100,15 @@ interface.get('/set-relay-state', (req, res) => {
 
 	if (state == 0 || state == 1) {
 		let msg = new Buffer.from([starting_signal, state]);
+
+		console.log('Sending request to set relay state to: ', state);
+
 		serialport.write(msg);
-		res.send('Done!');
+		res.send('Done');
 	} else 
 		res.send('Invalid param');
 })
 
 interface.listen(8000, () => {
-	console.log('Perkw interface listening on port 8000');
+	console.log('Perkw thing interface listening on port 8000');
 });
