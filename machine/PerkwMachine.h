@@ -7,7 +7,7 @@
 
 #define EPS 1e-2
 
-class PerkwThing {
+class PerkwMachine {
 private:
 	struct FetchSensors {
 		uint32_t id;

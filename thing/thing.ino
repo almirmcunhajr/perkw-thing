@@ -1,9 +1,9 @@
 #include <EmonLib.h>
-#include <PerkwThing.h>
+#include <PerkwMachine.h>
 #include <SensorsInfos.h>
 
 EnergyMonitor emon1;
-PerkwThing thing; 
+PerkwMachine machine; 
 
 float currentRead() {
   float irms = (float) emon1.calcIrms(1480);
@@ -35,10 +35,10 @@ void setup() {
   Serial.begin(9600);
   pinMode(RELAY_PIN, OUTPUT);
   emon1.current(CURRENT_SENSOR_PIN, 111.1);
-  thing.registerFetchSensor(CURRENT_SENSOR_ID, CURRENT_SENSOR_NAME, currentRead);
-  thing.registerStateSensor(RELAY_SENSOR_ID, RELAY_NAME, relayRead, relayWrite);
+  machine.registerFetchSensor(CURRENT_SENSOR_ID, CURRENT_SENSOR_NAME, currentRead);
+  machine.registerStateSensor(RELAY_SENSOR_ID, RELAY_NAME, relayRead, relayWrite);
 }
 
 void loop() {
-  thing.run();
+  machine.run();
 }

@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# Setup PerkwThing
-rm -rf "${HOME}/Arduino/libraries/PerkwThing"
-cp -r "src/PerkwThing" "${HOME}/Arduino/libraries/PerkwThing"
+# Setup PerkwMachine
+rm -rf "${HOME}/Arduino/libraries/PerkwMachine"
+cp -r "machine" "${HOME}/Arduino/libraries/PerkwMachine"
 
 # Setup EmonLib
 rm -rf "${HOME}/Arduino/libraries/EmonLib"
