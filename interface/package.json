@@ -9,7 +9,7 @@
   "author": "Almir M. da Cunha",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.16.3",
+    "express": "^4.17.3",
     "mongodb": "^3.1.1",
     "serialport": "^6.2.1"
   }
